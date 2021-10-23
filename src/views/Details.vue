@@ -1,6 +1,6 @@
 <!--
  * @Description: 商品详情页面组件
- * @Author: hai-27
+ * @Author: Tjj,wyc,lx,myq
  * @Date: 2020-02-16 20:20:26
  * @LastEditors: hai-27
  * @LastEditTime: 2020-03-07 21:59:26
@@ -11,19 +11,7 @@
     <div class="page-header">
       <div class="title">
         <p>{{ productDetails.productName }}</p>
-        <!--        <div class="list">
-                  <ul>
-                    <li>
-                      <router-link to>概述</router-link>
-                    </li>
-                    <li>
-                      <router-link to>参数</router-link>
-                    </li>
-                    <li>
-                      <router-link to>用户评价</router-link>
-                    </li>
-                  </ul>
-                </div>-->
+
       </div>
     </div>
     <!-- 头部END -->
@@ -32,18 +20,9 @@
     <div class="main">
       <!-- 左侧商品轮播图 -->
       <div class="block">
-        <!--        <el-carousel height="560px" v-if="productPicture">-->
-        <!--          <el-carousel-item v-for="item in productPicture" :key="item.id">-->
+
         <img style="height:350px;" :src="$targetVue + productPicture" alt="商品图片"/>
-        <!--          </el-carousel-item>-->
-        <!--        </el-carousel>-->
-        <!--        <div v-if="productPicture.length===1">
-                  <img
-                      style="height:560px;"
-                      :src="$target + productPicture[0].productPicture"
-                      :alt="productPicture[0].intro"
-                  />
-                </div>-->
+
       </div>
       <!-- 左侧商品轮播图END -->
 
@@ -75,23 +54,7 @@
           <el-button class="shop-cart" :disabled="dis" @click="addShoppingCart">加入购物车</el-button>
           <el-button class="like" @click="addCollect">喜欢</el-button>
         </div>
-        <!--         内容区底部按钮END-->
-        <!--        <div class="pro-policy">-->
-        <!--          <ul>-->
-        <!--            <li>-->
-        <!--              <i class="el-icon-circle-check"></i> 小米自营-->
-        <!--            </li>-->
-        <!--            <li>-->
-        <!--              <i class="el-icon-circle-check"></i> 小米发货-->
-        <!--            </li>-->
-        <!--            <li>-->
-        <!--              <i class="el-icon-circle-check"></i> 7天无理由退货-->
-        <!--            </li>-->
-        <!--            <li>-->
-        <!--              <i class="el-icon-circle-check"></i> 7天价格保护-->
-        <!--            </li>-->
-        <!--          </ul>-->
-        <!--        </div>-->
+
       </div>
       <!-- 右侧内容区END -->
     </div>
@@ -113,10 +76,7 @@ export default {
       gradeName: ''
     };
   },
-  /*created() {
-    this.productID = this.$route.query.productId;
-    this.getDetails(this.productID);
-  },*/
+
   // 通过路由获取商品id
   activated() {
     if (this.$route.query.productID !== undefined) {
@@ -152,19 +112,7 @@ export default {
         this.nowPrice = (this.productDetails.productPrice * this.discount).toFixed(2);
       })
     },
-    // 获取商品图片
-    /*getDetailsPicture(val) {
-      this.$axios
-          .post("product/getDetailsPicture", {
-            productID: val
-          })
-          .then(res => {
-            this.productPicture = res.data.ProductPicture;
-          })
-          .catch(err => {
-            return Promise.reject(err);
-          });
-    },*/
+
     // 加入购物车
     addShoppingCart() {
       // 判断是否登录,没有登录则显示登录组件
@@ -189,11 +137,6 @@ export default {
                 this.addShoppingCartNum(this.productID);
                 this.notifySucceed(res.data.data.msg);
                 break;
-                /*case "003":
-                  // 商品数量达到限购数量
-                  this.dis = true;
-                  this.notifyError(res.data.msg);
-                  break;*/
               default:
                 this.notifyError(res.data.msg);
             }
