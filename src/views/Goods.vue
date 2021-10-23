@@ -1,6 +1,6 @@
 <!--
  * @Description: 全部商品页面组件(包括全部商品,商品分类,商品搜索)
- * @Author: hai-27
+ * @Author: @Author: Tjj,wyc,lx,myq
  * @Date: 2020-02-07 16:23:00
  * @LastEditors: hai-27
  * @LastEditTime: 2020-03-08 12:11:13
