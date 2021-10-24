@@ -151,6 +151,9 @@ export default {
               if (res.data.data.code === "001") {
                 // 001 为成功, 更新vuex购物车状态
                 this.setShoppingCart(res.data.data.productList);
+                this.$axios.get("/user/getDiscount/" + val.id).then(res => {
+                  this.$store.state.discount = res.data.data.discount;
+                })
               } else {
                 // 提示失败信息
                 this.notifyError(res.data.data.msg);

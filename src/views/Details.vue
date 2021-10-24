@@ -1,9 +1,10 @@
 <!--
  * @Description: 商品详情页面组件
- * @Author: hai-27
- * @Date: 2020-02-16 20:20:26
- * @LastEditors: hai-27
- * @LastEditTime: 2020-03-07 21:59:26
+ * @Base: hai-27
+ * @Author: taoyyz
+ * @Date: 2020-02-21 18:40:41
+ * @LastEditors: taoyyz
+ * @LastEditTime: 2021-10-24 15:18:22
  -->
 <template>
   <div id="details">
@@ -148,6 +149,7 @@ export default {
     getDiscount(id) {
       this.$axios.get("/user/getDiscount/" + id).then(res => {
         this.discount = res.data.data.discount;
+        this.$store.state.discount = res.data.data.discount;
         this.gradeName = res.data.data.gradeName;
         this.nowPrice = (this.productDetails.productPrice * this.discount).toFixed(2);
       })
@@ -189,11 +191,6 @@ export default {
                 this.addShoppingCartNum(this.productID);
                 this.notifySucceed(res.data.data.msg);
                 break;
-                /*case "003":
-                  // 商品数量达到限购数量
-                  this.dis = true;
-                  this.notifyError(res.data.msg);
-                  break;*/
               default:
                 this.notifyError(res.data.msg);
             }

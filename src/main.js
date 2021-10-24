@@ -1,9 +1,10 @@
 /*
- * 入口文件
- * @Author: hai-27
- * @Date: 2020-02-07 16:23:00
- * @LastEditors: hai-27
- * @LastEditTime: 2020-03-04 23:38:41
+ * @Description: 入口文件
+ * @Base: hai-27
+ * @Author: taoyyz
+ * @Date: 2020-02-21 18:40:41
+ * @LastEditors: taoyyz
+ * @LastEditTime: 2021-10-24 15:18:22
  */
 import Vue from 'vue'
 import App from './App.vue'
@@ -25,7 +26,7 @@ Vue.use(ElementUI);
 
 Vue.use(Global);
 // eslint-disable-next-line no-unused-vars
-let AxiosInstance = Axios.create({
+export let AxiosInstance = Axios.create({
     // baseURL: 'http://120.79.141.53:10010'
     baseURL: 'http://localhost:10010'
 })
@@ -91,7 +92,6 @@ router.beforeResolve((to, from, next) => {
 // 格式: 2020-02-25 21:43:23
 Vue.filter('dateFormat', (dataStr) => {
     var time = new Date(dataStr);
-
     function timeAdd0(str) {
         if (str < 10) {
             str = '0' + str;

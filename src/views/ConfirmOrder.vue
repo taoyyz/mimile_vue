@@ -1,9 +1,10 @@
 <!--
  * @Description: 确认订单页面组件
- * @Author: hai-27
- * @Date: 2020-02-23 23:46:39
- * @LastEditors: hai-27
- * @LastEditTime: 2020-03-29 13:10:21
+ * @Base: hai-27
+ * @Author: taoyyz
+ * @Date: 2020-02-21 18:40:41
+ * @LastEditors: taoyyz
+ * @LastEditTime: 2021-10-24 15:18:22
  -->
 <template>
   <div class="confirmOrder">
@@ -23,24 +24,12 @@
     <div class="content">
       <!-- 选择地址 -->
       <div class="section-address">
-        <p class="title">收货地址</p>
+        <span class="title">收货地址：</span>
+        <span v-show="address">{{ address }}</span>
+        <span>
+          <el-button>{{ address ? '编辑地址' : '新增地址' }}</el-button>
+        </span>
         <div class="address-body">
-          <h4>{{ address }}</h4>
-          <!--          <ul>
-                      <li
-                        :class="item.id == confirmAddress ? 'in-section' : ''"
-                        v-for="item in address"
-                        :key="item.id"
-                      >
-                        <h2>{{item.name}}</h2>
-                        <p class="phone">{{item.phone}}</p>
-                        <p class="address">{{item.address}}</p>
-                      </li>
-                      <li class="add-address">
-                        <i class="el-icon-circle-plus-outline"></i>
-                        <p>添加新地址</p>
-                      </li>
-                    </ul>-->
         </div>
       </div>
       <!-- 选择地址END -->
@@ -53,9 +42,14 @@
             <li v-for="item in getCheckGoods" :key="item.id">
               <img :src="$targetVue + item.productPicture"/>
               <span class="pro-name">{{ item.productName }}</span>
-              <span class="pro-price">{{ item.productPrice }}元 × {{ item.count }}</span>
-              <span class="pro-status"></span>
-              <span class="pro-total">{{ item.productPrice * item.count }}元</span>
+              <span class="pro-price">
+                <span class="del">{{
+                    item.productPrice % 1 == 0 ? item.productPrice + '.00' : item.productPrice
+                  }}元</span>
+                {{ item.nowPrice }}元 × {{ item.count }}
+              </span>
+              <span class="pro-status"> - {{ ((item.productPrice - item.nowPrice) * item.count).toFixed(2) }}元</span>
+              <span class="pro-total">{{ (item.nowPrice * item.count).toFixed(2) }}元</span>
             </li>
           </ul>
         </div>
@@ -68,15 +62,6 @@
         <p class="shipment">包邮</p>
       </div>
       <!-- 配送方式END -->
-
-      <!--       发票
-            <div class="section-invoice">
-              <p class="title">发票</p>
-              <p class="invoice">电子发票</p>
-              <p class="invoice">个人</p>
-              <p class="invoice">商品明细</p>
-            </div>
-             发票END -->
 
       <!-- 结算列表 -->
       <div class="section-count">
@@ -92,7 +77,7 @@
             </li>
             <li>
               <span class="title">会员等级优惠：</span>
-              <span class="value">-0元</span>
+              <span class="value">{{ (getTotalPrice - getDiscountPrice).toFixed(2) }}元</span>
             </li>
             <li>
               <span class="title">运费：</span>
@@ -101,7 +86,7 @@
             <li class="total">
               <span class="title">应付总额：</span>
               <span class="value">
-                <span class="total-price">{{ getTotalPrice }}</span>元
+                <span class="total-price">{{ getDiscountPrice }}</span>元
               </span>
             </li>
           </ul>
@@ -130,21 +115,8 @@ export default {
     return {
       // 虚拟数据
       confirmAddress: 1, // 选择的地址id
-      // 地址列表
-      address: '' /*[
-        {
-          id: 1,
-          name: "陈同学",
-          phone: "13580018623",
-          address: "广东 广州市 白云区 江高镇 广东白云学院"
-        },
-        {
-          id: 2,
-          name: "陈同学",
-          phone: "13580018623",
-          address: "广东 茂名市 化州市 杨梅镇 ***"
-        }
-      ]*/
+      // 地址
+      address: ''
     };
   },
   created() {
@@ -155,7 +127,20 @@ export default {
       //否则设置用户地址
       this.address = res.data.data.address;
     })
-    console.log(this.$store.getters.getUser)
+    // 如果没有勾选购物车商品直接进入确认订单页面,提示信息并返回购物车
+    if (this.selectedNum < 1) {
+      this.notifyError("请勾选商品后再结算");
+      this.$router.push({path: "/shoppingCart"});
+    }
+  },
+  activated() {
+    //获取用户地址
+    this.$axios.get('/user/' + this.$store.getters.getUser.id).then(res => {
+      //如果用户没有设置地址，就
+
+      //否则设置用户地址
+      this.address = res.data.data.address;
+    })
     // 如果没有勾选购物车商品直接进入确认订单页面,提示信息并返回购物车
     if (this.selectedNum < 1) {
       this.notifyError("请勾选商品后再结算");
@@ -164,18 +149,19 @@ export default {
   },
   computed: {
     // 结算的商品数量; 结算商品总计; 结算商品信息
-    ...mapGetters(["getCheckNum", "getTotalPrice", "getCheckGoods"])
+    ...mapGetters(["getCheckNum", "getTotalPrice", "getCheckGoods", "getDiscountPrice"])
   },
   methods: {
     ...mapActions(["deleteShoppingCart"]),
     addOrder() {
-      this.$axios
-          .post("/order/addOrder", {
-            //下单的用户id
-            uid: this.$store.getters.getUser.id,
-            //下单的商品列表数组
-            productArr: this.getCheckGoods
-          }).then(res => {
+      this.$axios.post("/order/addOrder", {
+        //下单的用户id
+        uid: this.$store.getters.getUser.id,
+        //下单的商品列表数组
+        productArr: this.getCheckGoods,
+        //折扣
+        discount: this.$store.state.discount
+      }).then(res => {
         let products = this.getCheckGoods;
         switch (res.data.data.code) {
             // “001”代表结算成功
@@ -183,7 +169,7 @@ export default {
             for (let i = 0; i < products.length; i++) {
               const temp = products[i];
               // 删除已经结算的购物车商品
-              this.deleteShoppingCart(temp.id);
+              this.deleteShoppingCart({id: temp.id, isBtnDel: false});
             }
             // 提示结算结果
             this.notifySucceed(res.data.data.msg);
@@ -194,10 +180,9 @@ export default {
             // 提示失败信息
             this.notifyError(res.data.data.msg);
         }
-      })
-          .catch(err => {
-            return Promise.reject(err);
-          });
+      }).catch(err => {
+        return Promise.reject(err);
+      });
     }
   }
 };
@@ -325,36 +310,44 @@ export default {
 
 .confirmOrder .content .section-goods .goods-list li {
   padding: 10px 0;
+
   color: #424242;
   overflow: hidden;
 }
 
 .confirmOrder .content .section-goods .goods-list li img {
   float: left;
-  width: 30px;
-  height: 30px;
+  width: 50px;
+  height: 50px;
   margin-right: 10px;
 }
 
 .confirmOrder .content .section-goods .goods-list li .pro-name {
   float: left;
-  width: 650px;
-  line-height: 30px;
+  width: 580px;
+  line-height: 50px;
+  padding-left: 20px;
 }
 
 .confirmOrder .content .section-goods .goods-list li .pro-price {
   float: left;
-  width: 150px;
+  width: 170px;
   text-align: center;
-  line-height: 30px;
+  line-height: 50px;
+}
+
+.confirmOrder .content .section-goods .goods-list li .pro-price .del {
+  color: darkgray;
+  text-decoration: line-through;
 }
 
 .confirmOrder .content .section-goods .goods-list li .pro-status {
+  color: #ff9f6e;
   float: left;
   width: 99px;
-  height: 30px;
+  height: 50px;
   text-align: center;
-  line-height: 30px;
+  line-height: 50px;
 }
 
 .confirmOrder .content .section-goods .goods-list li .pro-total {
@@ -362,7 +355,7 @@ export default {
   width: 190px;
   text-align: center;
   color: #ff6700;
-  line-height: 30px;
+  line-height: 50px;
 }
 
 /* 商品及优惠券CSS END */

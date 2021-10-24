@@ -1,9 +1,10 @@
 <!--
- * @Description: 我的购物车页面组件
- * @Author: hai-27
- * @Date: 2020-02-20 01:55:47
- * @LastEditors: hai-27
- * @LastEditTime: 2020-02-27 13:36:42
+ * @Description: 购物车页面组件
+ * @Base: hai-27
+ * @Author: taoyyz
+ * @Date: 2020-02-21 18:40:41
+ * @LastEditors: taoyyz
+ * @LastEditTime: 2021-10-24 15:18:22
  -->
 
 <template>
@@ -53,7 +54,13 @@
             >{{ item.productName }}
             </router-link>
           </div>
-          <div class="pro-price">{{ item.productPrice }}元</div>
+          <div class="pro-price">
+            <span>{{ item.nowPrice }}元</span>&nbsp;&nbsp;
+            <span
+                v-show="item.nowPrice != item.productPrice"
+                class="del"
+            >{{ item.productPrice }}元</span>
+          </div>
           <div class="pro-num">
             <el-input-number
                 size="small"
@@ -63,7 +70,13 @@
                 :max="999"
             ></el-input-number>
           </div>
-          <div class="pro-total pro-total-in">{{ item.productPrice * item.count }}元</div>
+          <div class="pro-total pro-total-in">
+            <span>{{ toFixed2(item.nowPrice * item.count) }}元</span>&nbsp;&nbsp;&nbsp;
+            <span
+                v-show="item.nowPrice != item.productPrice"
+                class="del"
+            >{{ toFixed2(item.productPrice * item.count) }}元</span>
+          </div>
           <div class="pro-action">
             <el-popover placement="right">
               <p>确定删除吗？</p>
@@ -127,7 +140,8 @@ export default {
     return {
       productList: [],
       checkedAll: false,
-      selectedNum: 0
+      selectedNum: 0,
+      discount: 0
     }
   },
   created() {
@@ -135,6 +149,9 @@ export default {
       if (res.data.data.code === "001") {
         // 001 为成功, 更新vuex购物车状态
         this.productList = res.data.data.productList;
+        for (let i = 0; i < this.productList.length; i++) {
+          this.productList[i].nowPrice = (this.productList[i].productPrice * this.$store.state.discount).toFixed(2);
+        }
         this.setShoppingCart(res.data.data.productList);
       } else {
         // 提示失败信息
@@ -145,10 +162,14 @@ export default {
     });
   },
   activated() {
+    this.checkedAll = false;
     this.$axios.get("/shopCart/listShopCartById/" + this.$store.getters.getUser.id).then(res => {
       if (res.data.data.code === "001") {
         // 001 为成功, 更新vuex购物车状态
         this.productList = res.data.data.productList;
+        for (let i = 0; i < this.productList.length; i++) {
+          this.productList[i].nowPrice = (this.productList[i].productPrice * this.$store.state.discount).toFixed(2);
+        }
         this.setShoppingCart(res.data.data.productList);
       } else {
         // 提示失败信息
@@ -178,7 +199,7 @@ export default {
           case "001":
             // “001”代表更新成功
             // 提示更新成功信息
-            this.notifySucceed(res.data.data.msg);
+            // this.notifySucceed(res.data.data.msg);
             break;
           default:
             // 提示更新失败信息
@@ -211,7 +232,7 @@ export default {
               case "001":
                 // “001” 删除成功
                 // 更新vuex状态
-                this.deleteShoppingCart(index);
+                this.deleteShoppingCart({id: productID, isBtnDel: true});
                 // 提示删除成功信息
                 this.notifySucceed(res.data.data.msg);
                 break;
@@ -245,13 +266,15 @@ export default {
           product.checked = true;
         }
       }
+    },
+    toFixed2(num) {
+      return num.toFixed(2);
     }
   },
   computed: {
     ...mapGetters([
       "getShoppingCart",
       "getCheckNum",
-      // "getTotalPrice",
       "getNum"
     ]),
     computeSelectedNum() {
@@ -265,9 +288,9 @@ export default {
       let totalPrice = 0;
       for (let pro of this.productList) {
         if (pro.checked)
-          totalPrice += pro.productPrice * pro.count;
+          totalPrice += pro.nowPrice * pro.count;
       }
-      return totalPrice;
+      return totalPrice.toFixed(2);
     }
   }
 };
@@ -361,7 +384,7 @@ export default {
 
 .shoppingCart .content ul .pro-name {
   float: left;
-  width: 380px;
+  width: 360px;
 }
 
 .shoppingCart .content ul .pro-name a {
@@ -379,6 +402,12 @@ export default {
   text-align: center;
 }
 
+.del {
+  font-size: 16px;
+  color: #b0b0b0;
+  text-decoration: line-through;
+}
+
 .shoppingCart .content ul .pro-num {
   float: left;
   width: 150px;
@@ -387,12 +416,14 @@ export default {
 
 .shoppingCart .content ul .pro-total {
   float: left;
-  width: 120px;
-  padding-right: 81px;
-  text-align: right;
+  width: 180px;
+  /*padding-right: 81px;*/
+  margin: 0 20px;
+  text-align: center;
 }
 
 .shoppingCart .content ul .pro-total-in {
+  font-size: 20px;
   color: #ff6700;
 }
 
@@ -486,15 +517,14 @@ export default {
 
 /* 购物车为空的时候显示的内容CSS */
 .shoppingCart .cart-empty {
+  text-align: center;
   width: 1225px;
   margin: 0 auto;
 }
 
 .shoppingCart .cart-empty .empty {
   height: 300px;
-  padding: 0 0 130px 558px;
   margin: 65px 0 0;
-  background: url(../assets/imgs/cart-empty.png) no-repeat 124px 0;
   color: #b0b0b0;
   overflow: hidden;
 }

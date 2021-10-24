@@ -1,9 +1,10 @@
 <!--
- * @Description: 我的收藏页面组件
- * @Author: hai-27
- * @Date: 2020-02-20 17:22:56
- * @LastEditors: hai-27
- * @LastEditTime: 2020-03-12 19:34:00
+ * @Description: 收藏页面组件
+ * @Base: hai-27
+ * @Author: taoyyz
+ * @Date: 2020-02-21 18:40:41
+ * @LastEditors: taoyyz
+ * @LastEditTime: 2021-10-24 15:18:22
  -->
 <template>
   <div class="collect">
@@ -39,17 +40,15 @@ export default {
   activated() {
     // 获取收藏数据
     this.$axios
-      .post("/api/user/collect/getCollect", {
-        user_id: this.$store.getters.getUser.user_id
-      })
-      .then(res => {
-        if (res.data.code === "001") {
-          this.collectList = res.data.collectList;
-        }
-      })
-      .catch(err => {
-        return Promise.reject(err);
-      });
+        .post("/collect/" + this.$store.getters.getUser.id)
+        .then(res => {
+          if (res.data.data.code === "001") {
+            this.collectList = res.data.data.collectList;
+          }
+        })
+        .catch(err => {
+          return Promise.reject(err);
+        });
   }
 };
 </script>
@@ -57,11 +56,13 @@ export default {
 .collect {
   background-color: #f5f5f5;
 }
+
 .collect .collect-header {
   height: 64px;
   background-color: #fff;
   border-bottom: 2px solid #ff6700;
 }
+
 .collect .collect-header .collect-title {
   width: 1225px;
   margin: 0 auto;
@@ -69,35 +70,41 @@ export default {
   line-height: 58px;
   font-size: 28px;
 }
+
 .collect .content {
   padding: 20px 0;
   width: 1225px;
   margin: 0 auto;
 }
+
 .collect .content .goods-list {
   margin-left: -13.7px;
   overflow: hidden;
 }
+
 /* 收藏列表为空的时候显示的内容CSS */
 .collect .collect-empty {
+  text-align: center;
   width: 1225px;
   margin: 0 auto;
 }
+
 .collect .collect-empty .empty {
   height: 300px;
-  padding: 0 0 130px 558px;
   margin: 65px 0 0;
-  background: url(../assets/imgs/cart-empty.png) no-repeat 124px 0;
   color: #b0b0b0;
   overflow: hidden;
 }
+
 .collect .collect-empty .empty h2 {
   margin: 70px 0 15px;
   font-size: 36px;
 }
+
 .collect .collect-empty .empty p {
   margin: 0 0 20px;
   font-size: 20px;
 }
+
 /* 收藏列表为空的时候显示的内容CSS END */
 </style>
