@@ -5,7 +5,7 @@
  * @LastEditors: wyc
  * @LastEditTime: 2020-02-27 00:46:58
  */
-head.gridtable {
+head.gtidtable {
     font-family: verdana,arial,sans-serif;
     font-size:11px;
     color:#333333;
@@ -13,14 +13,14 @@ head.gridtable {
     border-color: #666666;
     border-collapse: collapse;
 }
-head.gridtable th {
+head.gtidtable th {
     border-width: 1px;
     padding: 8px;
     border-style: solid;
     border-color: #666666;
     background-color: #dedede;
 }
-head.gridtable td {
+head.gtidtable td {
     border-width: 1px;
     padding: 8px;
     border-style: solid;
