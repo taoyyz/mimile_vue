@@ -85,7 +85,7 @@
             <div class="ng-promise">
               <p class="text">
                 <a class="icon1" href="javascript:;">7天无理由退换货</a>
-                <a class="icon2" href="javascript:;">满99元全场免邮</a>
+                <a class="icon2" href="javascript:;">全场包邮</a>
                 <a class="icon3" style="margin-right: 0" href="javascript:;">100%品质保证</a>
               </p>
             </div>

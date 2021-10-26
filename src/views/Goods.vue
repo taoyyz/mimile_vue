@@ -36,7 +36,7 @@
 
     <!-- 主要内容区 -->
     <div class="main">
-      <div class="list">
+      <div class="list" v-loading="loading" element-loading-background="rgba(0, 0, 0, 0.8)">
         <MyList :list="product" v-if="product.length>0"></MyList>
         <div v-else class="none-product">抱歉没有找到相关的商品，请看看其他的商品</div>
       </div>
@@ -48,6 +48,7 @@
             :page-size="pageSize"
             :total="total"
             @current-change="currentChange"
+            hide-on-single-page
         ></el-pagination>
       </div>
       <!-- 分页END -->
@@ -67,7 +68,8 @@ export default {
       pageSize: 10, // 每页显示的商品数量
       currentPage: 1, //当前页码
       activeName: "-1", // 分类列表当前选中的id
-      search: "" // 搜索条件
+      search: "", // 搜索条件
+      loading: true
     };
   },
   created() {
@@ -184,19 +186,23 @@ export default {
     },
     // 向后端请求全部商品或分类商品数据
     getData() {
+      this.loading = true;
       // 如果分类列表为空则请求全部商品数据，否则请求分类商品数据
       const api = this.categoryID.length === 0 ? "/product/getAllProduct" : "/product/getProductByCategory";
       this.$axios.get(api + "?id=" + this.categoryID + "&currentPage=" + this.currentPage
           + "&pageSize=" + this.pageSize)
           .then(res => {
-            this.product = res.data.data.Product;
-            this.total = res.data.data.total;
-          }).catch(err => {
+                this.product = res.data.data.Product;
+                this.total = res.data.data.total;
+              }
+          ).catch(err => {
         return Promise.reject(err);
       });
+      this.loading = false;
     },
     // 通过搜索条件向后端请求商品数据
     getProductBySearch() {
+      this.loading = true;
       this.$axios
           .get("/product/getProductBySearch?" + 'search=' + this.search
               + '&currentPage=' + this.currentPage + '&pageSize=' + this.pageSize)
@@ -207,6 +213,7 @@ export default {
           .catch(err => {
             return Promise.reject(err);
           });
+      this.loading = false;
     }
   }
 };

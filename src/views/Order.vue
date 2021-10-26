@@ -20,12 +20,17 @@
     <!-- 我的订单头部END -->
 
     <!-- 我的订单主要内容 -->
-    <div class="order-content" v-if="ordersList.length>0">
+    <div class="order-content" v-if="ordersList.length>0"
+         v-loading="loading"
+         :element-loading-text="loadText"
+         element-loading-spinner="el-icon-loading"
+    >
       <div class="content" v-for="(order,index) in ordersList" :key="index">
         <ul>
           <!-- 我的订单表头 -->
           <li class="order-info">
             <div class="order-id">订单编号: {{ order[0].orderUuid }}</div>
+            <span class="order-address">收货地址：{{ order[0].orderAddress }}</span>
             <div class="order-time">订单时间: {{ order[0].createTime | dateFormat }}</div>
           </li>
           <li class="header">
@@ -85,6 +90,15 @@
       </div>
     </div>
     <!-- 订单为空的时候显示的内容END -->
+    <!--分页按钮-->
+    <el-pagination style="text-align: center"
+                   background
+                   layout="prev, pager, next"
+                   @current-change="currentChange"
+                   :page-size="pageSize"
+                   hide-on-single-page
+                   :total="total">
+    </el-pagination>
   </div>
 </template>
 <script>
@@ -95,28 +109,24 @@ export default {
     return {
       ordersList: [], // 订单列表
       productsList: [],
-      total: [] // 每个订单的商品数量及总价列表
+      total: 0,
+      currentPage: 1,
+      pageSize: 5,
+      loading: true,
+      loadText: ''
     };
   },
   activated() {
     // 获取订单数据
-    this.$axios
-        .get("/order/getAll/" + this.$store.getters.getUser.id)
-        // .get("/order/getAll/10")
-        .then(res => {
-          if (res.data.data.code === "001") {
-            this.ordersList = res.data.data.ordersList;
-            this.productsList = res.data.data.productsList;
-          } else {
-            this.notifyError(res.data.data.msg);
-          }
-        })
-        .catch(err => {
-          return Promise.reject(err);
-        });
-    // this.$axios.get("/product/get")
+    this.getData();
   },
   methods: {
+    currentChange(currentPage) {
+      this.loading = true;
+      this.loadText = "加载第" + currentPage + "页数据中...";
+      this.currentPage = currentPage;
+      this.getData();
+    },
     //获取此order订单的总价格
     getTotal(order) {
       let total = 0;
@@ -124,6 +134,24 @@ export default {
         total += (order[i].orderPrice * (order[i].discount / 100));
       }
       return total.toFixed(2);
+    },
+    getData() {
+      this.$axios
+          .get("/order/listOrderByPage?uid=" + this.$store.getters.getUser.id
+              + "&currentPage=" + this.currentPage + "&pageSize=" + this.pageSize)
+          .then(res => {
+            if (res.data.data.code === "001") {
+              this.ordersList = res.data.data.ordersList;
+              this.productsList = res.data.data.productsList;
+              this.total = res.data.data.total;
+            } else {
+              this.notifyError(res.data.data.msg);
+            }
+            this.loading = false;
+          })
+          .catch(err => {
+            return Promise.reject(err);
+          });
     }
   }
 };
@@ -265,6 +293,11 @@ export default {
 }
 
 .order .order-bar .order-bar-left .order-total {
+  color: #757575;
+}
+
+.order-address {
+  margin-left: 20px;
   color: #757575;
 }
 

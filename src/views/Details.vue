@@ -30,7 +30,7 @@
     <!-- 头部END -->
 
     <!-- 主要内容 -->
-    <div class="main">
+    <div class="main" v-loading="loading" element-loading-background="rgb(255, 255, 255,)">
       <!-- 左侧商品轮播图 -->
       <div class="block">
         <!--        <el-carousel height="560px" v-if="productPicture">-->
@@ -76,23 +76,6 @@
           <el-button class="shop-cart" :disabled="dis" @click="addShoppingCart">加入购物车</el-button>
           <el-button class="like" @click="addCollect">喜欢</el-button>
         </div>
-        <!--         内容区底部按钮END-->
-        <!--        <div class="pro-policy">-->
-        <!--          <ul>-->
-        <!--            <li>-->
-        <!--              <i class="el-icon-circle-check"></i> 小米自营-->
-        <!--            </li>-->
-        <!--            <li>-->
-        <!--              <i class="el-icon-circle-check"></i> 小米发货-->
-        <!--            </li>-->
-        <!--            <li>-->
-        <!--              <i class="el-icon-circle-check"></i> 7天无理由退货-->
-        <!--            </li>-->
-        <!--            <li>-->
-        <!--              <i class="el-icon-circle-check"></i> 7天价格保护-->
-        <!--            </li>-->
-        <!--          </ul>-->
-        <!--        </div>-->
       </div>
       <!-- 右侧内容区END -->
     </div>
@@ -111,7 +94,8 @@ export default {
       productPicture: "", // 商品图片
       discount: '',
       nowPrice: 0,
-      gradeName: ''
+      gradeName: '',
+      loading: true
     };
   },
   /*created() {
@@ -135,6 +119,7 @@ export default {
     ...mapActions(["unshiftShoppingCart", "addShoppingCartNum"]),
     // 获取商品详细信息
     getDetails(val) {
+      this.loading = true;
       this.$axios
           .get("product/" + val)
           .then(res => {
@@ -145,6 +130,7 @@ export default {
           .catch(err => {
             return Promise.reject(err);
           });
+      this.loading = false;
     },
     getDiscount(id) {
       this.$axios.get("/user/getDiscount/" + id).then(res => {

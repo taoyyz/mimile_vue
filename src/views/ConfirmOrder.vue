@@ -25,9 +25,12 @@
       <!-- 选择地址 -->
       <div class="section-address">
         <span class="title">收货地址：</span>
-        <span v-show="address">{{ address }}</span>
+        <span v-show="address && !isEditAddress">{{ address }}</span>
+        <span v-show="!address && !isEditAddress">未设置收货地址</span>
+        <el-input class="el-input" placeholder="请输入地址" v-model="address" v-show="isEditAddress" clearable></el-input>
         <span>
-          <el-button>{{ address ? '编辑地址' : '新增地址' }}</el-button>
+          <el-button type="primary" size="small" round v-show="address" @click="editAddress">{{ editBtn }}</el-button>
+          <el-button v-show="!address" @click="addAddress">新增地址</el-button>
         </span>
         <div class="address-body">
         </div>
@@ -110,28 +113,29 @@
 import {mapActions, mapGetters} from "vuex";
 
 export default {
+  props: ['selectedNum'],
   name: "",
   data() {
     return {
-      // 虚拟数据
-      confirmAddress: 1, // 选择的地址id
-      // 地址
-      address: ''
+      //用户收货地址
+      address: '',
+      isEditAddress: false,
+      editBtn: '编辑地址'
     };
   },
   created() {
-    //获取用户地址
+    //获取用户收货地址
     this.$axios.get('/user/' + this.$store.getters.getUser.id).then(res => {
       //如果用户没有设置地址，就
+      if (res.data.data.address == '') {
+        this.isEditAddress = false;
+      } else {
+        //否则设置了用户地址，获得用户的地址
+        this.address = res.data.data.address;
+      }
 
-      //否则设置用户地址
-      this.address = res.data.data.address;
     })
     // 如果没有勾选购物车商品直接进入确认订单页面,提示信息并返回购物车
-    if (this.selectedNum < 1) {
-      this.notifyError("请勾选商品后再结算");
-      this.$router.push({path: "/shoppingCart"});
-    }
   },
   activated() {
     //获取用户地址
@@ -153,6 +157,18 @@ export default {
   },
   methods: {
     ...mapActions(["deleteShoppingCart"]),
+    editAddress() {
+      if (this.editBtn == '编辑地址') {
+        this.editBtn = '确定';
+        this.isEditAddress = true;
+      } else {
+        this.editBtn = '编辑地址';
+        this.isEditAddress = false;
+      }
+    },
+    addAddress() {
+      this.isEditAddress = false;
+    },
     addOrder() {
       this.$axios.post("/order/addOrder", {
         //下单的用户id
@@ -191,6 +207,10 @@ export default {
 .confirmOrder {
   background-color: #f5f5f5;
   padding-bottom: 20px;
+}
+
+.el-input {
+  width: 180px;
 }
 
 /* 头部CSS */

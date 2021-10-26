@@ -22,7 +22,8 @@
     <!-- 购物车头部END -->
 
     <!-- 购物车有内容时的主要内容区 -->
-    <div class="content" v-if="getShoppingCart.length>0">
+    <div class="content" v-if="getShoppingCart.length>0" v-loading="loading"
+         element-loading-background="rgba(255,255,255,1)">
       <ul>
         <!-- 购物车表头 -->
         <li class="header">
@@ -112,7 +113,8 @@
             <span class="total-price-title">合计：</span>
             <span class="total-price">{{ getTotalPrice }}元</span>
           </span>
-          <router-link :to="computeSelectedNum > 0 ? '/confirmOrder' : ''">
+          <router-link
+              :to='computeSelectedNum > 0 ? "/confirmOrder" : ""'>
             <div :class="computeSelectedNum > 0 ? 'btn-primary' : 'btn-primary-disabled'">去结算</div>
           </router-link>
         </div>
@@ -141,10 +143,12 @@ export default {
       productList: [],
       checkedAll: false,
       selectedNum: 0,
-      discount: 0
+      discount: 0,
+      loading: true
     }
   },
   created() {
+    this.loading = true;
     this.$axios.get("/shopCart/listShopCartById/" + this.$store.getters.getUser.id).then(res => {
       if (res.data.data.code === "001") {
         // 001 为成功, 更新vuex购物车状态
@@ -157,11 +161,13 @@ export default {
         // 提示失败信息
         this.notifyError(res.data.data.msg);
       }
+      this.loading = false;
     }).catch(err => {
       return Promise.reject(err);
     });
   },
   activated() {
+    this.loading = true;
     this.checkedAll = false;
     this.$axios.get("/shopCart/listShopCartById/" + this.$store.getters.getUser.id).then(res => {
       if (res.data.data.code === "001") {
@@ -175,6 +181,7 @@ export default {
         // 提示失败信息
         this.notifyError(res.data.data.msg);
       }
+      this.loading = false;
     }).catch(err => {
       return Promise.reject(err);
     });
