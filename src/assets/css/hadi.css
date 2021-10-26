@@ -27,3 +27,20 @@ head.gridtable td {
     border-color: #666666;
     background-color: #ffffff;
 }
+footer {
+    width: 100%;
+    text-align: center;
+    background: #2f2f2f;
+    padding-bottom: 20px;
+}
+
+footer .ng-promise-box {
+    border-bottom: 1px solid #3d3d3d;
+    line-height: 145px;
+}
+
+footer .ng-promise-box {
+    margin: 0 auto;
+    border-bottom: 1px solid #3d3d3d;
+    line-height: 145px;
+}
