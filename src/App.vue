@@ -66,7 +66,9 @@
       <!-- 顶栏容器END -->
 
       <!-- 登录模块 -->
-      <MyLogin></MyLogin>
+      <MyLogin>
+
+      </MyLogin>
       <!-- 注册模块 -->
       <MyRegister :register="register" @fromChild="isRegister"></MyRegister>
 
@@ -205,6 +207,7 @@ export default {
 
 #app .el-header {
   padding: 0;
+  text-decoration:none;
 }
 
 #app .el-main {
@@ -299,6 +302,7 @@ a:hover {
 .el-header .el-menu {
   max-width: 1225px;
   margin: 0 auto;
+  text-decoration:none;
 }
 
 .el-header .logo {
