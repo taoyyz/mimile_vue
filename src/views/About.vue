@@ -10,7 +10,7 @@
     <div class="about-header">
       <div class="about-title">
         <i class="el-icon-tickets" style="color: #ff6700;"></i>
-        关于我们
+        关于我们,<a href="pineo.vue">点击链接了解</a>
       </div>
     </div>
     <div class="about-content">
