@@ -1,8 +1,8 @@
 <!--
  * @Description: 关于我们页面组件，未完成
- * @Author: hai-27
+ * @Author: tjj,wyc,lx,myq
  * @Date: 2020-02-07 16:23:00
- * @LastEditors: hai-27
+ * @LastEditors: tjj
  * @LastEditTime: 2020-03-12 19:36:46
  -->
 <template>
@@ -15,13 +15,14 @@
     </div>
     <div class="about-content">
       <MyMarkdown>
-        <router-link to="/pineo">点击链接了解</router-link>>
+        <router-link to="/pineo">点击链接了解</router-link>
       </MyMarkdown>
     </div>
   </div>
 </template>
 <script>
 import MyMarkdown from "../components/MyMarkdown";
+
 export default {
   components: {
     MyMarkdown
@@ -32,11 +33,13 @@ export default {
 .about {
   background-color: #f5f5f5;
 }
+
 .about .about-header {
   height: 64px;
   background-color: #fff;
   border-bottom: 2px solid #ff6700;
 }
+
 .about .about-header .about-title {
   width: 1225px;
   margin: 0 auto;
@@ -44,15 +47,18 @@ export default {
   line-height: 64px;
   font-size: 28px;
 }
+
 .about .content {
   padding: 20px 0;
   width: 1225px;
   margin: 0 auto;
 }
+
 .about .content .goods-list {
   margin-left: -13.7px;
   overflow: hidden;
 }
+
 .about .about-content {
   width: 1225px;
   margin: 0 auto;
