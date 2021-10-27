@@ -16,6 +16,7 @@
     <div class="about-content">
       <MyMarkdown>
         <router-link to="/pineo">点击链接了解</router-link>
+        <!--        补充了一个跳转页面-->
       </MyMarkdown>
     </div>
   </div>
