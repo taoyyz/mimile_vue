@@ -19,19 +19,17 @@
       </div>
     </div>
     <!-- 头部END -->
-
     <!-- 主要内容容器 -->
     <div class="content">
       <!-- 选择地址 -->
       <div class="section-address">
         <span class="title">收货地址：</span>
-        <span v-show="address && !isEditAddress">{{ address }}</span>
-        <span v-show="!address && !isEditAddress">未设置收货地址</span>
-        <el-input class="el-input" placeholder="请输入地址" v-model="address" v-show="isEditAddress" clearable></el-input>
-        <span>
-          <el-button type="primary" size="small" round v-show="address" @click="editAddress">{{ editBtn }}</el-button>
-          <el-button v-show="!address" @click="addAddress">新增地址</el-button>
-        </span>
+        <span v-show="!newAddress && !editAddress || showAddress" id="addressSpan"> {{ address }}</span>
+        <el-input class="el-input" placeholder="请输入地址" v-model="address" clearable v-show="isEdit">
+        </el-input>
+        <el-button v-show="confirmBtn" @click="confirmUpdateAddress">确定</el-button>
+        <el-button v-show="editAddress" @click="updateAddress">编辑地址</el-button>
+        <el-button v-show="newAddress" @click="addAddress">新增地址</el-button>
         <div class="address-body">
         </div>
       </div>
@@ -39,19 +37,21 @@
 
       <!-- 商品及优惠券 -->
       <div class="section-goods">
-        <p class="title">商品及优惠券</p>
+        <p class="title">商品及优惠</p>
         <div class="goods-list">
           <ul>
             <li v-for="item in getCheckGoods" :key="item.id">
               <img :src="$targetVue + item.productPicture"/>
               <span class="pro-name">{{ item.productName }}</span>
               <span class="pro-price">
-                <span class="del">{{
+                <span class="del" v-show="parseFloat(item.now) == item.productPrice">{{
                     item.productPrice % 1 == 0 ? item.productPrice + '.00' : item.productPrice
                   }}元</span>
                 {{ item.nowPrice }}元 × {{ item.count }}
               </span>
-              <span class="pro-status"> - {{ ((item.productPrice - item.nowPrice) * item.count).toFixed(2) }}元</span>
+              <span class="pro-status" v-show="parseFloat(item.now) == item.productPrice"> - {{
+                  ((item.productPrice - item.nowPrice) * item.count).toFixed(2)
+                }}元</span>
               <span class="pro-total">{{ (item.nowPrice * item.count).toFixed(2) }}元</span>
             </li>
           </ul>
@@ -101,7 +101,8 @@
       <div class="section-bar">
         <div class="btn">
           <router-link to="/shoppingCart" class="btn-base btn-return">返回购物车</router-link>
-          <a href="javascript:void(0);" @click="addOrder" class="btn-base btn-primary">结算</a>
+          <a href="" @click.prevent="addOrder"
+             :class="address == '' ? 'btn-base btn-primary-disabled' : 'btn-base btn-primary'  ">结算</a>
         </div>
       </div>
       <!-- 结算导航END -->
@@ -120,30 +121,57 @@ export default {
       //用户收货地址
       address: '',
       isEditAddress: false,
-      editBtn: '编辑地址'
+      editAddress: false,
+      newAddress: false,
+      isEdit: false,
+      showAddress: false,
+      confirmBtn: false
     };
   },
   created() {
+    this.address = ''
     //获取用户收货地址
     this.$axios.get('/user/' + this.$store.getters.getUser.id).then(res => {
       //如果用户没有设置地址，就
-      if (res.data.data.address == '') {
-        this.isEditAddress = false;
+      if (res.data.data.address == '' || res.data.data.address == null) {
+        this.editAddress = false;
+        //显示地址编辑框和新增按钮
+        this.newAddress = true;
+        this.isEdit = true;
+        this.showAddress = false;
       } else {
         //否则设置了用户地址，获得用户的地址
         this.address = res.data.data.address;
+        this.showAddress = true;
+        this.editAddress = true;
+        this.newAddress = false;
+        this.confirmBtn = false;
+        this.isEdit = false;
       }
 
     })
     // 如果没有勾选购物车商品直接进入确认订单页面,提示信息并返回购物车
   },
   activated() {
+    this.address = ''
     //获取用户地址
     this.$axios.get('/user/' + this.$store.getters.getUser.id).then(res => {
       //如果用户没有设置地址，就
-
-      //否则设置用户地址
-      this.address = res.data.data.address;
+      if (res.data.data.address == '' || res.data.data.address == null) {
+        this.editAddress = false;
+        //显示地址编辑框和新增按钮
+        this.newAddress = true;
+        this.isEdit = true;
+        this.showAddress = false;
+      } else {
+        //否则设置了用户地址，获得用户的地址
+        this.address = res.data.data.address;
+        this.showAddress = true;
+        this.editAddress = true;
+        this.newAddress = false;
+        this.confirmBtn = false;
+        this.isEdit = false;
+      }
     })
     // 如果没有勾选购物车商品直接进入确认订单页面,提示信息并返回购物车
     if (this.selectedNum < 1) {
@@ -157,48 +185,75 @@ export default {
   },
   methods: {
     ...mapActions(["deleteShoppingCart"]),
-    editAddress() {
-      if (this.editBtn == '编辑地址') {
-        this.editBtn = '确定';
-        this.isEditAddress = true;
-      } else {
-        this.editBtn = '编辑地址';
-        this.isEditAddress = false;
-      }
+    confirmUpdateAddress() {
+
+      document.getElementById("addressSpan").style.display = "inline";
+      //更新页面显示
+      this.showAddress = true;
+      this.newAddress = false;
+      this.isEdit = false;
+      this.editAddress = true;
+      this.confirmBtn = false;
+      //确认地址
+      this.$axios.get("/user/addAddress?address=" + this.address + '&id=' + this.$store.getters.getUser.id)
     },
     addAddress() {
-      this.isEditAddress = false;
+      //更新页面显示
+      this.showAddress = true;
+      this.newAddress = false;
+      this.isEdit = false;
+      this.editAddress = true;
+      //新增地址
+      this.$axios.get("/user/addAddress?address=" + this.address + '&id=' + this.$store.getters.getUser.id)
+    },
+    updateAddress() {
+      if (this.address) {
+        //地址存在，编辑
+      } else {
+        //地址不存在，
+      }
+      document.getElementById("addressSpan").style.display = "none";
+      this.newAddress = false;
+      this.confirmBtn = true;
+      this.editAddress = false;
+      this.isEdit = true;
+      this.showAddress = false;
     },
     addOrder() {
-      this.$axios.post("/order/addOrder", {
-        //下单的用户id
-        uid: this.$store.getters.getUser.id,
-        //下单的商品列表数组
-        productArr: this.getCheckGoods,
-        //折扣
-        discount: this.$store.state.discount
-      }).then(res => {
-        let products = this.getCheckGoods;
-        switch (res.data.data.code) {
-            // “001”代表结算成功
-          case "001":
-            for (let i = 0; i < products.length; i++) {
-              const temp = products[i];
-              // 删除已经结算的购物车商品
-              this.deleteShoppingCart({id: temp.id, isBtnDel: false});
-            }
-            // 提示结算结果
-            this.notifySucceed(res.data.data.msg);
-            // 跳转我的订单页面
-            this.$router.push({path: "/order"});
-            break;
-          default:
-            // 提示失败信息
-            this.notifyError(res.data.data.msg);
-        }
-      }).catch(err => {
-        return Promise.reject(err);
-      });
+      if (this.address) {
+        this.$axios.post("/order/addOrder", {
+          //下单的用户id
+          uid: this.$store.getters.getUser.id,
+          //下单的商品列表数组
+          productArr: this.getCheckGoods,
+          //折扣
+          discount: this.$store.state.discount
+        }).then(res => {
+          let products = this.getCheckGoods;
+          switch (res.data.data.code) {
+              // “001”代表结算成功
+            case "001":
+              for (let i = 0; i < products.length; i++) {
+                const temp = products[i];
+                // 删除已经结算的购物车商品
+                this.deleteShoppingCart({id: temp.id, isBtnDel: false});
+              }
+              // 提示结算结果
+              this.notifySucceed(res.data.data.msg);
+              // 跳转我的订单页面
+              this.$router.push({path: "/order"});
+              break;
+            default:
+              // 提示失败信息
+              this.notifyError(res.data.data.msg);
+          }
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      } else {
+        //还没设置地址
+        this.notifyError("请先设置收货地址");
+      }
     }
   }
 };
@@ -371,7 +426,7 @@ export default {
 }
 
 .confirmOrder .content .section-goods .goods-list li .pro-total {
-  float: left;
+  float: right;
   width: 190px;
   text-align: center;
   color: #ff6700;
@@ -502,10 +557,33 @@ export default {
   border-color: rgba(0, 0, 0, 0.27);
 }
 
-.confirmOrder .content .section-bar .btn .btn-primary {
+/*.confirmOrder .content .section-bar .btn .btn-primary {
   background: #ff6700;
   border-color: #ff6700;
   color: #fff;
+}*/
+.confirmOrder .content .section-bar .btn .btn-primary {
+  float: right;
+  width: 200px;
+  text-align: center;
+  font-size: 18px;
+  margin-left: 50px;
+  background: #ff6700;
+  color: #fff;
+}
+
+.confirmOrder .content .section-bar .btn .btn-primary-disabled {
+  float: right;
+  width: 200px;
+  text-align: center;
+  font-size: 18px;
+  margin-left: 50px;
+  background: #e0e0e0;
+  color: #b0b0b0;
+}
+
+.confirmOrder .content .section-bar .btn .btn-primary:hover {
+  background-color: #f25807;
 }
 
 /* 结算导航CSS */

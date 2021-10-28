@@ -24,9 +24,6 @@
             <li>
               <router-link to="/order">我的订单</router-link>
             </li>
-            <li>
-              <router-link to="/collect">我的收藏</router-link>
-            </li>
             <li :class="getNum > 0 ? 'shopCart-full' : 'shopCart'">
               <router-link to="/shoppingCart">
                 <i class="el-icon-shopping-cart-full"></i> 购物车
@@ -54,7 +51,6 @@
           </div>
           <el-menu-item index="/">首页</el-menu-item>
           <el-menu-item index="/goods">全部商品</el-menu-item>
-          <el-menu-item index="/about">关于我们</el-menu-item>
 
           <div class="so">
             <el-input placeholder="请输入搜索内容" v-model="search" @keyup.enter="searchClick">
@@ -102,8 +98,6 @@
               <router-link to="/">首页</router-link>
               <span>|</span>
               <router-link to="/goods">全部商品</router-link>
-              <span>|</span>
-              <router-link to="/about">关于我们</router-link>
             </p>
             <p class="coty">商城版权所有 &copy; 2012-2021</p>
           </div>
@@ -181,6 +175,8 @@ export default {
       // 清空vuex登录信息
       this.setUser("");
       this.notifySucceed("成功退出登录");
+      //跳转到首页
+      this.$router.push("/");
     },
     // 接收注册子组件传过来的数据
     isRegister(val) {

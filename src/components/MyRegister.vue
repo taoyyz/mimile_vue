@@ -92,8 +92,7 @@ export default {
         return callback(new Error("请输入邮箱"));
       }
       // 邮箱以任意字符跟@符号以及.之后跟任意符号
-      // const emailRule = /^\w+@\w+\.\w+$/;
-      const emailRule = /^\w/;
+      const emailRule = /^\w+@\w+\.\w+$/;
       if (emailRule.test(value)) {
         //判断数据库中是否已经存在该邮箱
         this.$axios

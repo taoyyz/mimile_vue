@@ -112,6 +112,8 @@ export default {
                   this.setUser(res.data.data.user);
                   // 弹出通知框提示登录成功信息
                   this.notifySucceed(res.data.data.msg);
+                  //路由到首页
+                  this.$router.push("/")
                 } else {
                   // 清空输入框的校验状态
                   this.$refs["ruleForm"].resetFields();

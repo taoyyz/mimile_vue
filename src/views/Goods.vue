@@ -1,10 +1,12 @@
 <!--
  * @Description: 全部商品页面组件(包括全部商品,商品分类,商品搜索)
- * @Author: @Author: Tjj,wyc,lx,myq
- * @Date: 2020-02-07 16:23:00
- * @LastEditors: hai-27
- * @LastEditTime: 2020-03-08 12:11:13
+ * @Base: hai-27
+ * @Author: Tjj,wyc,lx,myq
+ * @Date: 2020-02-21 18:40:41
+ * @LastEditors: taoyyz
+ * @LastEditTime: 2021-10-26 15:18:22
  -->
+-->
 <template>
   <div class="goods" id="goods" name="goods">
 
@@ -25,8 +27,8 @@
     <!-- 分类标签END -->
 
     <!-- 主要内容区 -->
-    <div class="main">
-      <div class="list" v-loading="loading" element-loading-background="rgba(0, 0, 0, 0.8)">
+    <div class="main" v-loading="loading" element-loading-background="rgba(0, 0, 0, 0.8)">
+      <div class="list">
         <MyList :list="product" v-if="product.length>0"></MyList>
         <div v-else class="none-product">抱歉没有找到相关的商品，请看看其他的商品</div>
       </div>
@@ -67,6 +69,7 @@ export default {
     this.getCategory();
   },
   activated() {
+    this.getCategory();
     this.activeName = "-1"; // 初始化分类列表当前选中的id为-1
     this.total = 0; // 初始化商品总量为0
     this.currentPage = 1; //初始化当前页码为1
@@ -273,8 +276,10 @@ export default {
 }
 
 .goods .main .none-product {
-  color: #333;
-  margin-left: 13.7px;
+  color: gray;
+  padding-top: 180px;
+  text-align: center;
+  font-size: 30px;
 }
 
 /* 主要内容区CSS END */

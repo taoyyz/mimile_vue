@@ -7,7 +7,7 @@
  * @LastEditTime: 2021-10-24 15:18:22
  -->
 <template>
-  <div class="order">
+  <div class="order" v-loading="loading">
     <!-- 我的订单头部 -->
     <div class="order-header">
       <div class="order-header-content">
@@ -21,7 +21,6 @@
 
     <!-- 我的订单主要内容 -->
     <div class="order-content" v-if="ordersList.length>0"
-         v-loading="loading"
          :element-loading-text="loadText"
          element-loading-spinner="el-icon-loading"
     >

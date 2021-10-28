@@ -12,19 +12,6 @@
     <div class="page-header">
       <div class="title">
         <p>{{ productDetails.productName }}</p>
-        <!--        <div class="list">
-                  <ul>
-                    <li>
-                      <router-link to>概述</router-link>
-                    </li>
-                    <li>
-                      <router-link to>参数</router-link>
-                    </li>
-                    <li>
-                      <router-link to>用户评价</router-link>
-                    </li>
-                  </ul>
-                </div>-->
       </div>
     </div>
     <!-- 头部END -->
@@ -33,18 +20,7 @@
     <div class="main" v-loading="loading" element-loading-background="rgb(255, 255, 255,)">
       <!-- 左侧商品轮播图 -->
       <div class="block">
-        <!--        <el-carousel height="560px" v-if="productPicture">-->
-        <!--          <el-carousel-item v-for="item in productPicture" :key="item.id">-->
         <img style="height:350px;" :src="$targetVue + productPicture" alt="商品图片"/>
-        <!--          </el-carousel-item>-->
-        <!--        </el-carousel>-->
-        <!--        <div v-if="productPicture.length===1">
-                  <img
-                      style="height:560px;"
-                      :src="$target + productPicture[0].productPicture"
-                      :alt="productPicture[0].intro"
-                  />
-                </div>-->
       </div>
       <!-- 左侧商品轮播图END -->
 
@@ -68,13 +44,12 @@
               {{ productDetails.productPrice }}元
             </span>
           </span>
-          <p class="price-sum" v-if="discount == 1">总计： : {{ nowPrice }}元</p>
+          <p class="price-sum" v-if="discount == 1">总计：{{ nowPrice }}元</p>
           <p class="price-sum" v-else>{{ gradeName }}用户，可享受{{ discount * 10 }}折优惠，仅需： {{ nowPrice }}元</p>
         </div>
         <!-- 内容区底部按钮 -->
-        <div class="button">
+        <div class="button" style="">
           <el-button class="shop-cart" :disabled="dis" @click="addShoppingCart">加入购物车</el-button>
-          <el-button class="like" @click="addCollect">喜欢</el-button>
         </div>
       </div>
       <!-- 右侧内容区END -->
@@ -92,7 +67,7 @@ export default {
       productID: "", // 商品id
       productDetails: "", // 商品详细信息
       productPicture: "", // 商品图片
-      discount: '',
+      discount: 1,
       nowPrice: 0,
       gradeName: '',
       loading: true
@@ -107,6 +82,7 @@ export default {
     if (this.$route.query.productID !== undefined) {
       this.productID = this.$route.query.productID;
     }
+    this.getDiscount(this.$store.getters.getUser.id)
   },
   watch: {
     // 监听商品id的变化，请求后端获取商品数据
@@ -133,26 +109,15 @@ export default {
       this.loading = false;
     },
     getDiscount(id) {
-      this.$axios.get("/user/getDiscount/" + id).then(res => {
-        this.discount = res.data.data.discount;
-        this.$store.state.discount = res.data.data.discount;
-        this.gradeName = res.data.data.gradeName;
-        this.nowPrice = (this.productDetails.productPrice * this.discount).toFixed(2);
-      })
+      if (!(this.$store.getters.getUser == '' || this.$store.getters.getUser == null)) {
+        this.$axios.get("/user/getDiscount/" + id).then(res => {
+          this.discount = res.data.data.discount;
+          this.$store.state.discount = res.data.data.discount;
+          this.gradeName = res.data.data.gradeName;
+          this.nowPrice = (this.productDetails.productPrice * this.discount).toFixed(2);
+        });
+      }
     },
-    // 获取商品图片
-    /*getDetailsPicture(val) {
-      this.$axios
-          .post("product/getDetailsPicture", {
-            productID: val
-          })
-          .then(res => {
-            this.productPicture = res.data.ProductPicture;
-          })
-          .catch(err => {
-            return Promise.reject(err);
-          });
-    },*/
     // 加入购物车
     addShoppingCart() {
       // 判断是否登录,没有登录则显示登录组件
